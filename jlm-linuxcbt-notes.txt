@@ -1,0 +1,24 @@
+
+###Linux - User Administration###
+1. Add, Remove and Modify users
+ a. User = account
+ b. Only root (sudo user) can administer users/groups
+  b1. Commands = useradd, usermod, userdel (in /usr/sbin)
+  b2. Default config files for new users = /etc/skel
+ c. Passwords can be changed en-mass by using the following command:
+     chpasswd < /path/to/pwfile  
+  c2. Example PW File format:
+     jmoren:changed01
+     rsmith:changed02
+     tjohnson:changed03
+  d. User info stored in /etc/passwd, password (encryted) stored in /etc/shadow
+2. Groups  - Users can be aded to groups
+  a. Group info stored in /etc/group, password (encypted) stored in /etc/gshadow
+  b. Add user to group = usermod -G username
+3. Permissions (Modes)
+ a. Seperate permissions for: User, Group, Other - ls -l shows permissions (modes)
+ b. Changing file permissions = chmod g+w filename - adds write permission to group of 	    file.  
+  b1. chmod  ug=rw filename - resets permissions of filename completely,          gives user  and group read and write permissions to file.
+  b2. chmod 754 filename - uses permission binary to modify permissions od file.  754 gives RWX to User, R+X for Group and R for Other
+ c. Directory Modes - Full Access -> rwx, Limited (Enter,Read) -> r-x, No Access -> ---
+

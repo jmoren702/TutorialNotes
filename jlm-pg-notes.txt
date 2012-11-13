@@ -1,0 +1,203 @@
+###Features of PostgreSQL###
+
+1. Object Relational Database Management System (ORDBMS)
+  a. Objects can be related in a hierarchy;  Parent -> Child
+
+2. Transactional RDBMS:
+Note:  Transactional statements must execute:  ALL or NONE.
+  a. SQL statments have implicit:  BEGIN; COMMIT; statements
+  b. SQL statements may also have explicit:  BEGIN; COMMIT; statements
+
+3.  Note/Feature:
+  a. Developed originally @ UC Berkeley
+
+4.  One process per connection
+  a. Managed by master process:  'postmaster' (Postgres master process that spawns other processes, auto-spawans new processes to handle each new connection)
+
+5.  Processes use only ONE CPU
+Note:  The Linux disto/OS will place/spawn processes on diff CPU/cores, Postgres does not do this
+
+6.  Multiple helper processes, which appear as 'postgres', always running
+  a. Stats collector
+  b. Backgrond writer
+  c. Autovacuum (cleanup/space-reclaimer process)
+  d. WALsender (Write-ahead log, prevenrs corruption by commiting changes ahead of time) 
+
+7.  Max DB size:  Unlimited (only limited by OS and avail storage)
+Note:  Consider deploying in 64-bit environment to prevebt 32-bit storage limitations 
+
+8.  Max Table Size: 32TB - stored as multiple 1GB files
+9.  Max Row Size: 400GB
+10.  Max Column Size: 1GB
+11.  Max Indexes: Unlimited
+12.  Max Identifier (DB Objects, ie tables,columns,functions,triggers,etc):  63bytes
+Note: The limitation is extensible via source-code
+13.  TCP:5432 (Default listener)
+  a. You may install PosgreSQL as a non-priveleged user
+14.  Users are distinct from OS  users - ie, like MySQL
+15.  Users are shared across all DBs
+16.  Inheritance
+  a. Tables lower in hierarchy may inherit columns from higher tables
+  b. Caveat:  No unique contraints or foreign keys support
+17.  Case-insensive commands - sans doble quotes - ie 'select * from Syslog;'
+18.  Case-sensitive commands include double quotes - ie 'select * from "Syslog";'
+19.  There are 3 primary conf files:  $POSTGRESROOT/data/*.conf
+  a. 'pg_hba.conf' - controls host/user/DB connectivity
+  b. 'postgresql.conf' - general settings
+  c. 'pg_ident.conf' 0 user settings
+20.  Integrated Log Rotation/Management - Log Collection - 'postgresql.conf'
+  a. Citeria: Age | Size
+
+
+###Installation###
+Features:
+1.  Download bin from Enterprise DB postgresql.org
+
+Tasks
+2.  Install...
+Note:  May indicate data files to be stored independentaly of source dir tree
+Note:  A 'Database Cluster' is simply the management of more than one DB
+Note:  Default is o start the RDBMS the post-installation script
+3.  Explore the footprint (install locations)
+  a. 'psql' is the terminal cli monitor utility
+  b. 'create|dropdb' - creates|drops DB
+  c. 'createuser|dropuser - creates|drops users
+  d. 'postgres' - server daemon
+  e. 'data/' - Top-level data/config files/log files
+  f. 'data/pg_log' - log files (default is : STDERR)
+  g. 'data/pg_xlog' - Write Ahead Log (WAL) - Mainains changes to DB filse at all times
+  h. 'data/postmaster.opts' - contains startup options, influences the way the   postgres daemon starts
+  i. 'etc/init.d/postgresql-9.1' - INITD Manager - start|stop|restart|status postgresql service
+
+Note: Files, except INITD files, are cotained within /opt/postgresql/version hierarchy
+4.  Provides access to docs via Apache
+  a. 'ls -s /opt/PostgreSQL/9.1/doc/
+5.  Update:  $linuxcbt/.bashrc to reflect: /opt/PostgreSQL/9.1/bin - to access binaries (Exept when installed via apt-get..binaries are located here: /usr/bin)
+
+### 'psql' ###
+Features:
+1. (Non)Interactive usage - ie 'mysql' monitor equivelant
+2. Command History
+3. Tab Completion
+4. Commands terminate wiuth semicolon and may wrap lines and have whitespace separators
+5. Defaults to supplying the currentlly logged in user
+
+Tasks:
+1. Explore 'psql'
+  a. 'psql' --version
+  b. 'psql -l -U postgres' lists DBs and exits
+ Note:  PostgreSQL installs 4 defauls DBs:
+ postgres, template0 and template1
+  i.   'postgres' - contains user accounts DB, etc.
+  ii.  'template0' - vanilla, original DB
+  iii. 'template1' - copy of template0, and may be extended, and is used to generate new DBs
+  
+  c. 'psql' - enters interactive mode 
+   c1. trailing '#' indicates a superuser is logged in
+  d. '\h' - returns sql-specifiuc help
+  e. '\?' - returns 'psql'-specific help - ie usable metasequences (shortcuts for getting into from psql)
+  f. '\l[+]' - returns list of DBs
+  g. '\du[+]' - returns list of users in system DB
+  h. '\!' - returns user to $SHELL
+  i. '\! name-of-shell-command' - executes a specific command - non-interactively
+Note: Typcal $SHELL symantics apply
+  j. '\i name-of-file' executes SQL commands from a file - ie 'psql' or SQL commands
+Note:  Multiple commands can be run w/ one refernce.  Terminate set w/ ';' and use space between commands.
+  k. '\c DBNAME [REMOTE HOST]' - connects to different DB and optionally different host
+Note:  Current DB is sown in prompt
+  l. '\dS[+] - Shows tables, vews, sequeces and other DB objects
+  j. '\q' - Quit 'psql'
+  k. 'psql -h hostname -U valid_PGUSER' - allows remote connectivity to remote Postgresql instance.  Make sure appropriate hosts are allowed in **pg_hba.conf**
+
+###Logging###
+Features:
+ 1. Three types of logging:
+  a. 'stderr' (Default)
+  b. 'csvlog' - import intgo spreadsheets | DBs
+  c. 'syslog' 
+ 2. Controlled via: $POSTGRESROOT/data/postgresql.conf
+ 3. Simultaneous logging
+ 4. Ability to control verbosity
+ 5. Auto-logrotate is included based on criteria: Age | size
+ 6. Logs handled by the included logger are stored in: $POSTGRESROOT/data/pg_log
+Note: Syslog-handled messages are routed according to syslog rules: /etc/rsyslog.conf (Debian)
+ 7. First process launched by master process
+
+Tasks:
+ 1. Explore: $POSTGREEOOT/dara/postgresql.conf
+ 2. Configure syslog
+  a. Update syslog config for: 'LOCAL0', facility - consider updating: LogRotate
+  b. Update: $POSTGRESROOT/data/postgresql.conf = 'stderr, syslog'
+ 3. Configure csvlog
+  a. Append:  'csvlog' to log_destination VAR: $POSTGRESQL/data/postgresql.conf
+
+###Common Data Types###
+Features:
+ 1. Allow us to control the type of data, on per column basis
+
+Types:
+ Numeric:
+  a. 'smallint' - 16-bits (2-bytes) - whole numbers, -32000 to +32000
+  b. 'int' - integer - 32-bits (4-bytes) - whole numbers -2billion - +2billion
+  c. 'bigint' - Big integer - 64-bits (8-bytes) - whol numbers only - -9EB - + 9EB
+  d. 'numeric[(precision,scale)]'
+   d1.  precision = significant figures
+   d2.  scale = number of values to right of decimal point
+Note: 'numeric' sans precision supports up to: 1000 digits of precision
+  e. 'real' - 32-bits - variable - 6 decimal digits of precision
+  f. 'double precision' - 64-bits (8-bytes) - variable - 15 decimal digits of precision
+  g. 'serial' - 32-bits (2^31) signed - auto-incrementing
+  h. 'bigserial' - 64-bits (2^63) - signed - auto-incrementing
+
+Money:
+  a. 'money' - 64-bits - 2^63 signed -9EB - +9EB
+
+Strings - Text
+  a. 'text' - varchar - unlimited - preferred character storage type within Postgresql
+  b. 'char(n)' - fixed-length, blank-padded if value stored is < 'n' length
+   b1. ie - 'char(9)' - 'linuxcbt' -> stored as 'linuxcbt '
+ Note: char(n) truncates values that are > 'n' length
+   b2. ie - 'char' = 'char(1)' - effectively becomes a 1-character field
+  c. 'varchar(n)' - variable length with 'n' limit IF 'n' is present - Does NOT blank-pad
+   c1. ie - 'varchar(9)' - 'linuxcbt' -> sored as: 'linuxcbt'
+   c2. ie - 'varchar' -> variable length - Does NOT blank-pad
+Note: Use 'text' or 'varchar' when storing strings
+
+Dates & Times:  Uses 'Julian Dates (from 4713 BC to 10^5+ years ahead' - in date calculations
+  a. 'date' - 32-bits - date only (no time)
+  b. 'time' - 64-bits - defaults to time w/o timezone - microsecond precision
+  c. 'time with time zone' - 96-bits - 12-bytes - date and time WITH timezone - microsecond precision
+  d. 'timestamp with timezone' - 64-bits - ...
+  e.  
+  c. 'datetime' - 32-bits - date and time
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
