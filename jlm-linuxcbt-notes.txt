@@ -1,5 +1,6 @@
 
 ###Linux - User Administration###
+
 1. Add, Remove and Modify users
  a. User = account
  b. Only root (sudo user) can administer users/groups
@@ -21,4 +22,114 @@
   b1. chmod  ug=rw filename - resets permissions of filename completely,          gives user  and group read and write permissions to file.
   b2. chmod 754 filename - uses permission binary to modify permissions od file.  754 gives RWX to User, R+X for Group and R for Other
  c. Directory Modes - Full Access -> rwx, Limited (Enter,Read) -> r-x, No Access -> ---
+
+
+
+###Filesystems and Security###
+
+1. Partition creation tools - mkfs, fdisk, fsck
+ a. fdisk -l = Lists existing partitions on current disk
+ b. fdisk - enters fdisk command menu - m (help, displays commands)
+ c. mkfs - Creates partitions/filesystems on disk (ie EXT4, NTFS, etc)
+ d. fsck - Checks filesystem for errors - To use this tool, umount then re-mount filesystem as RO then run   fschk
+2. mount/umount - Mounts and unmounts filesystems, partitions and devices to local dirs such as /mnt/dir
+ a. Mount CVDROM drive:  mount -t iso9660 /dev/cdrom0 /mnt/cdrom
+ b. umount /mnt/cdrom - Unmounts CDROM device
+3. df,du - df, reports system disk size, du, reports system directory size (ie - du -h /home/jmoren = displays size of /home/jmoren dir in human-readable format) - see man pages for more info on each
+4. /mnt - System dir that is typically the mount location for mounted partitions
+5. /dev - System dir that contains device files (ie - hda = local hard disk, etc)
+
+6. Linux Directory Structure
+ /bin  - critical/commonly used binary executable files (ie - ls, less, more, cd, etc)
+ /boot - boot files
+ /etc  - system/application config files
+ /dev  - device files such as hda1 or cdrom0
+ /home - user profile dires and files
+ /lib  - shared application libraries
+ /mnt  - where media gets mounts typically 
+ /opt  - location for pre-packaged 'optional' applications typically get ginstalled (ie - google chrome gets installed here)
+ /proc - contains system process files such as processor, memory allocation, current running processes, etc
+ /root - rot user home dir 
+ /var  - variable dir that contains rapidly or frequently changing files (ie - log, database, print spool, etc)
+ /sbin - system administration utilities
+ /tmp  - temporary files dir - any user can write to this dir
+ /usr  - user-specific data or utilities (ie - /usr/sbin contains user-specific sysadmin utilities such ass useradd or usermod)
+   /usr/bin - less-critical binary files (ie - clear, compilers, etc)
+   /usr/include - if you want to include a specific function such as a specific C function
+ 
+7. Security
+ a. Common security tasks - remove dormant accounts, get users to choose strong passwords
+ b. Remove unnecessary programs
+ c. Check default user permissions - umask values in /etc/profile - umasy -S
+ d. Check /etc/shadow file - check permissions for this file, make sure its read only by root only
+  d1. Check permissions on the /usr/bin/passwd command (check other files for 's' permissions should ONLY be set on internal commands such as passwd!
+
+
+###Networking###
+
+--Overview--
+1. Hardware - Ethernet over CAT6 -> Switch -> Router -> Switch
+2. Packets  - Segments of data carrie over the wire - contains 'header' info that moves packet to its destination
+3. Protocols - TCP, IP, UDP, etc - 
+4. Addressing - hardware(MAC address), IP addresses->DNS<-hostnames
+
+--Configuration--
+1. Red Hat uses a tool called netconfig -
+ a. can also use ifconfig to config interfaces: 
+    ifconfig eth0 up 10.1.160.159 netmask 255.255.255.0
+    route add default gw 10.1.160.1
+    /etc/resolv.conf:  add following to add DNS servers: nameserver 10.1.160.5
+--Remote Access--
+1. Telnet - NEVER USE THIS, password is sent in plain text!!  Use SSH.
+2. FTP (CLI), gftp (graphical FTP application)
+Controlling Access
+1. Firewall
+ a. IP Tables
+--Remote Admin--
+1. SSH
+
+
+###Linux Essentials###
+--X Windows--
+1. X Server - xfree86, xserver.org
+2. Window Manager - GTK, Ice, etc - Look and feel
+3. Desktop Environment - Gnome, KDE, etc - graphical utilities, apps, etc
+
+--Shell Scripting--
+1. "Sh-Bang" (Sharp character followed by exclamation point) starts a shell script = #!/bin/bash
+ex script =
+	#!/bin/bash
+	# Shell script comments start with sharp/pound sign
+        echo "This is a shell script!"
+	echo "Prett cool heh?"   #You can add comments on the same line as code too!
+ a. Variables can be used - declare them with '$' - example = $var_name
+ex script using variable =
+	#!/bin/bash
+	var_name="Jeff is cool!"
+	echo $var_name
+2. To execute script use sh or ./ - ie sh script_name.sh OR ./script_name.sh
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
